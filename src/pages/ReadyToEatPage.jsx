@@ -6,6 +6,7 @@ import {
 import { READY_TO_EAT_CATEGORIES, READY_TO_EAT_PRODUCTS } from '../data/readyToEatData';
 import { ProductGrid } from '../components/ProductGrid';
 import { ProductDetailsModal } from '../components/ProductDetailsModal';
+import { handleBackNavigation } from '../utils/navigation';
 
 export const ReadyToEatPage = () => {
   const navigate = useNavigate();
@@ -109,7 +110,8 @@ export const ReadyToEatPage = () => {
           <div className="fruits-header-left">
             <div className="breadcrumbs-container" style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '12px' }}>
               <button 
-                onClick={() => navigate(-1)} 
+                type="button"
+                onClick={(e) => handleBackNavigation(navigate, e)} 
                 className="back-arrow-btn"
                 title="Go back"
               >

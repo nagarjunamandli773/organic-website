@@ -12,11 +12,32 @@ export const CategoryGrid = () => {
       image: '/images/fruits_hero_banner.jpg'
     },
     {
-      id: 'organic-food',
-      title: 'Organic Food',
-      subtitle: 'Healthy & Natural',
-      slug: 'organic-food',
-      image: '/images/organic_foods_banner.png'
+      id: 'snacks',
+      title: 'Snacks',
+      subtitle: 'Crunchy & Wholesome',
+      slug: 'snacks',
+      image: '/images/cat_snacks.jpg'
+    },
+    {
+      id: 'sweets',
+      title: 'Sweets',
+      subtitle: 'Pure & Traditional',
+      slug: 'sweets',
+      image: '/images/cat_sweets.jpg'
+    },
+    {
+      id: 'drinks',
+      title: 'Drinks / Beverages',
+      subtitle: 'Cold-Pressed & Pure',
+      slug: 'healthy-drinks',
+      image: 'https://images.unsplash.com/photo-1620916566398-39f1143ab7be?w=600&auto=format&fit=crop&q=80'
+    },
+    {
+      id: 'ready-to-eat',
+      title: 'Ready-to-Eat Food',
+      subtitle: 'Quick & Wholesome',
+      slug: 'ready-to-eat',
+      image: 'https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=600&auto=format&fit=crop&q=80'
     },
     {
       id: 'cosmetics',
@@ -30,21 +51,14 @@ export const CategoryGrid = () => {
       title: 'Hair Oils',
       subtitle: 'Nourish & Strengthen',
       slug: 'hair-oils',
-      image: 'https://images.unsplash.com/photo-1608248543803-ba4f8c70ae0b?w=600&auto=format&fit=crop&q=80'
+      image: '/images/hair_oils_banner.jpg'
     },
     {
       id: 'org-chemicals',
-      title: 'Org Chemicals',
+      title: 'Organic Chemicals',
       subtitle: 'Safe & Non-Toxic',
       slug: 'org-chemicals',
-      image: 'https://images.unsplash.com/photo-1585320806297-9794b3e4eeae?w=600&auto=format&fit=crop&q=80'
-    },
-    {
-      id: 'organic-products',
-      title: 'Organic Products',
-      subtitle: 'Pure & Eco-Certified',
-      slug: 'organic-products',
-      image: '/images/fruits_hero_banner.jpg'
+      image: '/images/natural_fertilizer.jpg'
     }
   ];
 

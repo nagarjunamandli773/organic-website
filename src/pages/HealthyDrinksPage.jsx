@@ -6,6 +6,7 @@ import {
 import { HEALTHY_DRINKS_CATEGORIES, HEALTHY_DRINKS_PRODUCTS } from '../data/healthyDrinksData';
 import { ProductGrid } from '../components/ProductGrid';
 import { ProductDetailsModal } from '../components/ProductDetailsModal';
+import { handleBackNavigation } from '../utils/navigation';
 
 export const HealthyDrinksPage = () => {
   const navigate = useNavigate();
@@ -109,7 +110,8 @@ export const HealthyDrinksPage = () => {
           <div className="fruits-header-left">
             <div className="breadcrumbs-container" style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '12px' }}>
               <button 
-                onClick={() => navigate(-1)} 
+                type="button"
+                onClick={(e) => handleBackNavigation(navigate, e)} 
                 className="back-arrow-btn"
                 title="Go back"
               >

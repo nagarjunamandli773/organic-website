@@ -1,6 +1,7 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { ShieldCheck, Heart, Leaf, Award, Users, CheckCircle, ArrowLeft } from 'lucide-react';
+import { handleBackNavigation } from '../utils/navigation';
 
 export const AboutPage = () => {
   const navigate = useNavigate();
@@ -22,7 +23,8 @@ export const AboutPage = () => {
     <div className="about-page">
       <div style={{ marginBottom: '12px' }}>
         <button 
-          onClick={() => navigate(-1)} 
+          type="button"
+          onClick={(e) => handleBackNavigation(navigate, e)} 
           className="back-arrow-btn"
           title="Go back to previous page"
         >

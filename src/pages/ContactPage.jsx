@@ -22,6 +22,7 @@ import {
   Calendar,
   ArrowLeft
 } from 'lucide-react';
+import { handleBackNavigation } from '../utils/navigation';
 
 export const ContactPage = () => {
   const navigate = useNavigate();
@@ -90,7 +91,8 @@ export const ContactPage = () => {
       <section className="contact-hero-section">
         <div style={{ position: 'absolute', top: '16px', left: '16px', zIndex: 10 }}>
           <button 
-            onClick={() => navigate(-1)} 
+            type="button"
+            onClick={(e) => handleBackNavigation(navigate, e)} 
             className="back-arrow-btn"
             style={{ background: '#ffffff', boxShadow: '0 2px 8px rgba(0,0,0,0.1)' }}
             title="Go back to previous page"

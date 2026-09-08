@@ -1,9 +1,11 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { OFFERS } from '../data/offers';
+import { useAuth } from './AuthContext';
 
 const CartContext = createContext();
 
 export const CartProvider = ({ children }) => {
+  const { user } = useAuth();
   const [cartItems, setCartItems] = useState(() => {
     const saved = localStorage.getItem('klan_cart');
     return saved ? JSON.parse(saved) : [
@@ -50,8 +52,17 @@ export const CartProvider = ({ children }) => {
     ];
   });
 
-  const [appliedCoupon, setAppliedCoupon] = useState(null);
+  const [appliedCoupon, setAppliedCoupon] = useState(() => {
+    try {
+      const saved = localStorage.getItem('klan_applied_coupon');
+      return saved ? JSON.parse(saved) : null;
+    } catch (e) {
+      return null;
+    }
+  });
+
   const [couponError, setCouponError] = useState('');
+  const [couponSuccess, setCouponSuccess] = useState('');
   const [isCartOpen, setIsCartOpen] = useState(false);
   const [toastMessage, setToastMessage] = useState(null);
 
@@ -59,11 +70,72 @@ export const CartProvider = ({ children }) => {
     localStorage.setItem('klan_cart', JSON.stringify(cartItems));
   }, [cartItems]);
 
+  useEffect(() => {
+    if (appliedCoupon) {
+      localStorage.setItem('klan_applied_coupon', JSON.stringify(appliedCoupon));
+    } else {
+      localStorage.removeItem('klan_applied_coupon');
+    }
+  }, [appliedCoupon]);
+
   const showToast = (msg) => {
     setToastMessage(msg);
     setTimeout(() => {
       setToastMessage(null);
     }, 3000);
+  };
+
+  const getUserKey = () => {
+    if (user && user.email) {
+      return user.email.toLowerCase().trim();
+    }
+    return 'guest';
+  };
+
+  const isCouponUsedByUser = (code, offerObj) => {
+    const userKey = getUserKey();
+    const usedCouponsKey = `klan_used_coupons_${userKey}`;
+    try {
+      const usedList = JSON.parse(localStorage.getItem(usedCouponsKey) || '[]');
+      if (Array.isArray(usedList) && usedList.includes(code.toUpperCase())) {
+        return true;
+      }
+    } catch (e) {
+      // ignore
+    }
+
+    if (offerObj?.isFirstOrderOnly || code.toUpperCase() === 'WELCOME10') {
+      const hasCompletedOrder = userKey !== 'guest' && localStorage.getItem(`klan_has_completed_order_${userKey}`);
+      const hasUsedWelcome = userKey !== 'guest' && localStorage.getItem(`klan_used_welcome_coupon_${userKey}`);
+      if (hasCompletedOrder || hasUsedWelcome) {
+        return true;
+      }
+    }
+
+    return false;
+  };
+
+  const markCouponAsUsed = (code) => {
+    if (!code) return;
+    const cleanCode = code.toUpperCase();
+    const userKey = getUserKey();
+    const usedCouponsKey = `klan_used_coupons_${userKey}`;
+    try {
+      const existing = JSON.parse(localStorage.getItem(usedCouponsKey) || '[]');
+      if (!existing.includes(cleanCode)) {
+        existing.push(cleanCode);
+        localStorage.setItem(usedCouponsKey, JSON.stringify(existing));
+      }
+    } catch (e) {
+      localStorage.setItem(usedCouponsKey, JSON.stringify([cleanCode]));
+    }
+
+    if (userKey !== 'guest' && (cleanCode === 'WELCOME10' || appliedCoupon?.isFirstOrderOnly)) {
+      localStorage.setItem(`klan_used_welcome_coupon_${userKey}`, 'true');
+    }
+
+    setAppliedCoupon(null);
+    localStorage.removeItem('klan_applied_coupon');
   };
 
   const addToCart = (product, quantity = 1) => {
@@ -84,7 +156,8 @@ export const CartProvider = ({ children }) => {
           price: product.price,
           unit: product.unit || '1 unit',
           quantity,
-          image: product.image
+          image: product.image,
+          category: product.category
         }
       ];
     });
@@ -108,53 +181,106 @@ export const CartProvider = ({ children }) => {
     );
   };
 
+  const subtotal = cartItems.reduce((acc, item) => acc + (item.price * item.quantity), 0);
+
   const applyCoupon = (code) => {
     setCouponError('');
-    if (!code) {
+    setCouponSuccess('');
+
+    if (!code || !code.trim()) {
       setCouponError('Please enter a coupon code.');
       return false;
     }
-    const found = OFFERS.find(o => o.code.toUpperCase() === code.trim().toUpperCase());
+
+    const cleanCode = code.trim().toUpperCase();
+    const found = OFFERS.find(o => o.code.toUpperCase() === cleanCode);
+
     if (!found) {
-      setCouponError('Invalid coupon code. Try KLAN200, KLAN500, or FREESHIP');
+      setCouponError('Invalid coupon code. Please check and try again.');
       return false;
     }
+
+    // Expiration check
+    if (found.expiryDate) {
+      const today = new Date().toISOString().split('T')[0];
+      if (today > found.expiryDate) {
+        setCouponError(`This coupon (${found.code}) expired on ${found.expiryDateFormatted || found.expiryDate}.`);
+        return false;
+      }
+    }
+
+    // Single-use / user restriction check
+    if (isCouponUsedByUser(found.code, found)) {
+      setCouponError(`You have already used coupon code "${found.code}".`);
+      return false;
+    }
+
+    // First order requirement check
+    if (found.isFirstOrderOnly || found.code === 'WELCOME10') {
+      if (!user || !user.isLoggedIn) {
+        setCouponError('WELCOME10 coupon is only available for logged-in first-time users. Please log in first.');
+        return false;
+      }
+    }
+
+    // Minimum Order Value check
     if (subtotal < found.minOrder) {
-      setCouponError(`Minimum order amount for ${found.code} is ₹${found.minOrder}`);
+      const needed = (found.minOrder - subtotal).toFixed(2);
+      setCouponError(`Minimum order amount of ₹${found.minOrder} is required for ${found.code}. Add ₹${needed} more to apply.`);
       return false;
     }
+
+    // Category specific check (e.g. COS20 for Cosmetics)
+    if (found.category) {
+      const hasCategoryItem = cartItems.some(item => 
+        (item.category && item.category.toLowerCase().includes(found.category.toLowerCase())) ||
+        (item.name && item.name.toLowerCase().includes(found.category.toLowerCase()))
+      );
+      if (!hasCategoryItem) {
+        setCouponError(`Coupon ${found.code} is valid only on ${found.category} products.`);
+        return false;
+      }
+    }
+
     setAppliedCoupon(found);
-    showToast(`Coupon ${found.code} applied successfully!`);
+    setCouponSuccess(`Coupon "${found.code}" applied successfully!`);
+    showToast(`Coupon "${found.code}" applied successfully!`);
     return true;
   };
 
   const removeCoupon = () => {
     setAppliedCoupon(null);
+    localStorage.removeItem('klan_applied_coupon');
     setCouponError('');
+    setCouponSuccess('Coupon removed.');
     showToast('Coupon removed');
   };
 
   const clearCart = () => {
     setCartItems([]);
     setAppliedCoupon(null);
+    localStorage.removeItem('klan_applied_coupon');
   };
 
   const cartCount = cartItems.reduce((acc, item) => acc + item.quantity, 0);
 
-  const subtotal = cartItems.reduce((acc, item) => acc + (item.price * item.quantity), 0);
-
   let discount = 0;
   if (appliedCoupon) {
-    if (appliedCoupon.discountType === 'fixed') {
+    // Re-verify minimum order value in case items were removed from cart
+    if (subtotal < appliedCoupon.minOrder) {
+      setAppliedCoupon(null);
+      localStorage.removeItem('klan_applied_coupon');
+      setCouponError(`Coupon ${appliedCoupon.code} removed because subtotal fell below ₹${appliedCoupon.minOrder}`);
+      discount = 0;
+    } else if (appliedCoupon.discountType === 'fixed') {
       discount = appliedCoupon.discountAmount;
     } else if (appliedCoupon.discountType === 'percent') {
       discount = Math.round((subtotal * appliedCoupon.discountPercent) / 100);
     } else if (appliedCoupon.discountType === 'shipping') {
-      discount = subtotal > 499 ? 49 : 0;
+      discount = subtotal >= 499 ? 49 : 0;
     }
   } else {
-    // Default reference discount matching reference PPT screenshot (₹174.00)
-    discount = subtotal > 1000 ? 174 : 0;
+    discount = 0;
   }
 
   const deliveryFee = subtotal >= 499 || (appliedCoupon && appliedCoupon.discountType === 'shipping') ? 0 : 49;
@@ -173,8 +299,13 @@ export const CartProvider = ({ children }) => {
       updateQuantity,
       applyCoupon,
       removeCoupon,
+      markCouponAsUsed,
+      isCouponUsedByUser,
       appliedCoupon,
       couponError,
+      setCouponError,
+      couponSuccess,
+      setCouponSuccess,
       clearCart,
       isCartOpen,
       setIsCartOpen,

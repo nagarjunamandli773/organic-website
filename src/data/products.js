@@ -2387,7 +2387,7 @@ const RAW_PRODUCTS = [
     "badge": null,
     "isBestseller": false,
     "isOrganic": true,
-    "image": "https://images.unsplash.com/photo-1556228720-195a672e8a03?w=600&auto=format&fit=crop&q=80",
+    "image": "/cosmetics/Ubtan Face Pack.jpg",
     "certification": "100% Organic",
     "benefits": [
       "Removes suntan",
@@ -2803,7 +2803,7 @@ const RAW_PRODUCTS = [
     "badge": null,
     "isBestseller": false,
     "isOrganic": true,
-    "image": "https://images.unsplash.com/photo-1556228720-195a672e8a03?w=600&auto=format&fit=crop&q=80",
+    "image": "/cosmetics/De-Tan Face Gel.jpg",
     "certification": "Chemical Free",
     "benefits": [
       "Soothes sunburn",
@@ -3739,7 +3739,7 @@ const RAW_PRODUCTS = [
     "badge": null,
     "isBestseller": false,
     "isOrganic": true,
-    "image": "/images/pseudomonas_and_seaweed.png",
+    "image": "/images/Pseudomonas Bio Liquid.jpg",
     "certification": "Chemical Free",
     "benefits": [
       "Bacterial disease shield",
@@ -3765,7 +3765,7 @@ const RAW_PRODUCTS = [
     "badge": "Bestseller",
     "isBestseller": true,
     "isOrganic": true,
-    "image": "/images/pseudomonas_and_seaweed.png",
+    "image": "/images/Seaweed Extract Liquid.jpg",
     "certification": "100% Organic",
     "benefits": [
       "Boosts flower & fruit set",
@@ -5221,7 +5221,7 @@ const RAW_PRODUCTS = [
     "badge": null,
     "isBestseller": false,
     "isOrganic": true,
-    "image": "/organic foods/Organic Whole Black Pepper.png",
+    "image": "/organic foods/Organic Black Cumin Seeds (Kalonji).png",
     "certification": "100% Organic",
     "benefits": [
       "Immunity boosting black seeds",
@@ -5383,32 +5383,6 @@ const RAW_PRODUCTS = [
       "Antioxidant superfood",
       "Supports eye health & immunity",
       "Delicious chewy berry"
-    ]
-  },
-  {
-    "id": "of-38",
-    "name": "Organic Poppy Seeds (Khus Khus)",
-    "category": "Organic Food",
-    "categoryId": "organic-food",
-    "subCategory": "Spices & Herbs",
-    "subDesc": "White Khus Khus",
-    "shortDesc": "White Khus Khus",
-    "description": "Pure white organic poppy seeds (Khus Khus) for rich curries and desserts.",
-    "price": 260,
-    "originalPrice": 325,
-    "unit": "150g",
-    "rating": 4.8,
-    "reviewsCount": 115,
-    "availability": "In Stock",
-    "badge": null,
-    "isBestseller": false,
-    "isOrganic": true,
-    "image": "/organic foods/Organic Poppy Seeds (Khus Khus).png",
-    "certification": "100% Organic",
-    "benefits": [
-      "Cooling & soothing spice",
-      "Creates creamy rich gravies",
-      "Rich in calcium & zinc"
     ]
   },
   {
@@ -5767,7 +5741,7 @@ const RAW_PRODUCTS = [
     "badge": "Bestseller",
     "isBestseller": true,
     "isOrganic": true,
-    "image": "https://images.unsplash.com/photo-1596040033229-a9821ebd058d?w=600&auto=format&fit=crop&q=80",
+    "image": "/organic foods/Organic Black Cumin Seeds (Kalonji).png",
     "certification": "100% Organic",
     "benefits": [
       "Thymoquinone immunity",
@@ -5845,7 +5819,7 @@ const RAW_PRODUCTS = [
     "badge": null,
     "isBestseller": false,
     "isOrganic": true,
-    "image": "https://images.unsplash.com/photo-1596040033229-a9821ebd058d?w=600&auto=format&fit=crop&q=80",
+    "image": "/organic foods/Organic Garcinia (Kodampuli).png",
     "certification": "100% Organic",
     "benefits": [
       "Natural souring agent",
@@ -5871,7 +5845,7 @@ const RAW_PRODUCTS = [
     "badge": null,
     "isBestseller": false,
     "isOrganic": true,
-    "image": "https://images.unsplash.com/photo-1596040033229-a9821ebd058d?w=600&auto=format&fit=crop&q=80",
+    "image": "/organic foods/Organic Fenugreek Seeds (Methi).png",
     "certification": "100% Organic",
     "benefits": [
       "Maple-like aroma",
@@ -5949,38 +5923,12 @@ const RAW_PRODUCTS = [
     "badge": "Bestseller",
     "isBestseller": true,
     "isOrganic": true,
-    "image": "https://images.unsplash.com/photo-1508061253366-f7da158b6d46?w=600&auto=format&fit=crop&q=80",
+    "image": "/organic foods/Organic Goji Berries.png",
     "certification": "100% Organic",
     "benefits": [
       "Tibetan superfood",
       "Rich antioxidants",
       "Immune support berry"
-    ]
-  },
-  {
-    "id": "of-40",
-    "name": "Organic Poppy Seeds (Khus Khus)",
-    "category": "Organic Food",
-    "categoryId": "organic-food",
-    "subCategory": "Nuts & Seeds",
-    "subDesc": "Calcium-Dense Seeds",
-    "shortDesc": "Calcium-Dense Seeds",
-    "description": "Tiny white poppy seeds for curries, pastes and traditional Indian sweets.",
-    "price": 280,
-    "originalPrice": 350,
-    "unit": "200g",
-    "rating": 4.7,
-    "reviewsCount": 65,
-    "availability": "In Stock",
-    "badge": null,
-    "isBestseller": false,
-    "isOrganic": true,
-    "image": "https://images.unsplash.com/photo-1514733670139-4d87a1941d55?w=600&auto=format&fit=crop&q=80",
-    "certification": "100% Organic",
-    "benefits": [
-      "High calcium content",
-      "Cooling spice property",
-      "Culinary delicacy"
     ]
   },
   {

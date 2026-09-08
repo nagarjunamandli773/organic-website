@@ -3,6 +3,7 @@ import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { Mail, Lock, User, Phone, Sparkles, ArrowRight, ShieldCheck, Eye, EyeOff, ArrowLeft, ChevronRight, Leaf, CheckCircle2 } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { useCart } from '../context/CartContext';
+import { handleBackNavigation } from '../utils/navigation';
 
 export const LoginPage = () => {
   const navigate = useNavigate();
@@ -72,7 +73,8 @@ export const LoginPage = () => {
       {/* Breadcrumb & Navigation */}
       <div className="combo-nav-breadcrumbs" style={{ marginBottom: '20px' }}>
         <button
-          onClick={() => navigate(-1)}
+          type="button"
+          onClick={(e) => handleBackNavigation(navigate, e)}
           className="back-arrow-btn"
           title="Go back to previous page"
         >

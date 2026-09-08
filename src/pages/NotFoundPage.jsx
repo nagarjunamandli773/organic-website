@@ -1,8 +1,11 @@
 import React from 'react';
-import { Link } from 'react-router-dom';
-import { Home } from 'lucide-react';
+import { Link, useNavigate } from 'react-router-dom';
+import { Home, ArrowLeft } from 'lucide-react';
+import { handleBackNavigation } from '../utils/navigation';
 
 export const NotFoundPage = () => {
+  const navigate = useNavigate();
+
   return (
     <div className="not-found-page">
       <div className="not-found-card">
@@ -12,10 +15,21 @@ export const NotFoundPage = () => {
           Oops! The organic page you are looking for does not exist or has been moved.
         </p>
 
-        <Link to="/" className="btn-solid-green back-home-btn">
-          <Home size={18} />
-          <span>Go Back Home</span>
-        </Link>
+        <div style={{ display: 'flex', gap: '12px', justifyContent: 'center', flexWrap: 'wrap' }}>
+          <button 
+            type="button" 
+            onClick={(e) => handleBackNavigation(navigate, e)} 
+            className="btn-outline-green back-home-btn"
+          >
+            <ArrowLeft size={18} />
+            <span>Go Back</span>
+          </button>
+
+          <Link to="/" className="btn-solid-green back-home-btn">
+            <Home size={18} />
+            <span>Go Back Home</span>
+          </Link>
+        </div>
       </div>
     </div>
   );

@@ -20,6 +20,7 @@ import {
   ArrowLeft
 } from 'lucide-react';
 import { MOCK_ORDERS } from '../data/ordersData';
+import { handleBackNavigation } from '../utils/navigation';
 
 export const TrackOrderPage = () => {
   const navigate = useNavigate();
@@ -167,7 +168,8 @@ export const TrackOrderPage = () => {
       <div className="track-order-container">
         <div style={{ marginBottom: '12px' }}>
           <button 
-            onClick={() => navigate(-1)} 
+            type="button"
+            onClick={(e) => handleBackNavigation(navigate, e)} 
             className="back-arrow-btn"
             title="Go back to previous page"
           >

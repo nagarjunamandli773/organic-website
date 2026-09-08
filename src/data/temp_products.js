@@ -2383,7 +2383,7 @@ module.exports = [
     "badge": null,
     "isBestseller": false,
     "isOrganic": true,
-    "image": "https://images.unsplash.com/photo-1556228720-195a672e8a03?w=600&auto=format&fit=crop&q=80",
+    "image": "/cosmetics/Ubtan Face Pack.jpg",
     "certification": "100% Organic",
     "benefits": [
       "Removes suntan",
@@ -2799,7 +2799,7 @@ module.exports = [
     "badge": null,
     "isBestseller": false,
     "isOrganic": true,
-    "image": "https://images.unsplash.com/photo-1556228720-195a672e8a03?w=600&auto=format&fit=crop&q=80",
+    "image": "/cosmetics/De-Tan Face Gel.jpg",
     "certification": "Chemical Free",
     "benefits": [
       "Soothes sunburn",
@@ -3735,7 +3735,7 @@ module.exports = [
     "badge": null,
     "isBestseller": false,
     "isOrganic": true,
-    "image": "/images/pseudomonas_and_seaweed.png",
+    "image": "/images/Pseudomonas Bio Liquid.jpg",
     "certification": "Chemical Free",
     "benefits": [
       "Bacterial disease shield",
@@ -3761,7 +3761,7 @@ module.exports = [
     "badge": "Bestseller",
     "isBestseller": true,
     "isOrganic": true,
-    "image": "/images/pseudomonas_and_seaweed.png",
+    "image": "/images/Seaweed Extract Liquid.jpg",
     "certification": "100% Organic",
     "benefits": [
       "Boosts flower & fruit set",

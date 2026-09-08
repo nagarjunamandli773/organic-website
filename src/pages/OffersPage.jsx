@@ -8,6 +8,7 @@ import { OFFERS } from '../data/offers';
 import { PRODUCTS } from '../data/products';
 import { CATEGORIES } from '../data/categories';
 import { useCart } from '../context/CartContext';
+import { handleBackNavigation } from '../utils/navigation';
 
 export const OffersPage = () => {
   const navigate = useNavigate();
@@ -49,7 +50,8 @@ export const OffersPage = () => {
     <div className="offers-exact-page">
       <div style={{ marginBottom: '12px' }}>
         <button 
-          onClick={() => navigate(-1)} 
+          type="button"
+          onClick={(e) => handleBackNavigation(navigate, e)} 
           className="back-arrow-btn"
           title="Go back to previous page"
         >

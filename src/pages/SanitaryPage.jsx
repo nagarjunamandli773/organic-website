@@ -6,6 +6,7 @@ import {
 import { SANITARY_CATEGORIES, SANITARY_PRODUCTS } from '../data/sanitaryData';
 import { ProductGrid } from '../components/ProductGrid';
 import { ProductDetailsModal } from '../components/ProductDetailsModal';
+import { handleBackNavigation } from '../utils/navigation';
 
 export const SanitaryPage = () => {
   const navigate = useNavigate();
@@ -105,7 +106,8 @@ export const SanitaryPage = () => {
           <div className="fruits-header-left">
             <div className="breadcrumbs-container" style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '12px' }}>
               <button 
-                onClick={() => navigate(-1)} 
+                type="button"
+                onClick={(e) => handleBackNavigation(navigate, e)} 
                 className="back-arrow-btn"
                 title="Go back"
               >

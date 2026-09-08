@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { CheckCircle, Package, Home, Calendar, Hash, CreditCard, Truck, MapPin, ShoppingBag } from 'lucide-react';
+import { CheckCircle, Package, Home, Calendar, Hash, CreditCard, Truck, MapPin, ShoppingBag, Tag } from 'lucide-react';
 
 export const OrderSuccessPage = () => {
   const [lastOrder, setLastOrder] = useState(null);
@@ -81,6 +81,18 @@ export const OrderSuccessPage = () => {
               </div>
               <div className="receipt-value delivery-badge">Within 24 Hours</div>
             </div>
+
+            {(orderData.appliedCoupon || orderData.discount > 0) && (
+              <div className="receipt-row discount-receipt-row">
+                <div className="receipt-label text-emerald-700">
+                  <Tag size={15} />
+                  <span>Coupon Discount ({orderData.appliedCoupon?.code || 'Applied'})</span>
+                </div>
+                <div className="receipt-value font-semibold text-emerald-600">
+                  -₹{Number(orderData.discount || orderData.appliedCoupon?.discountAmount || 0).toFixed(2)}
+                </div>
+              </div>
+            )}
 
             <div className="receipt-row receipt-total-row">
               <div className="receipt-label">Total Amount</div>

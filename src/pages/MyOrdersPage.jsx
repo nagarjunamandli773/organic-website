@@ -35,11 +35,15 @@ import {
   Award,
   Sparkles,
   Clock,
-  Printer,
-  Download,
-  FileText
+  Printer, 
+  Download, 
+  FileText,
+  Smartphone,
+  Zap,
+  QrCode
 } from 'lucide-react';
 import { MOCK_ORDERS } from '../data/ordersData';
+import { handleBackNavigation } from '../utils/navigation';
 import { PRODUCTS } from '../data/products';
 import { useCart } from '../context/CartContext';
 import { useWishlist } from '../context/WishlistContext';
@@ -136,20 +140,46 @@ export const MyOrdersPage = ({ initialNav }) => {
   const [paymentMethods, setPaymentMethods] = useState(() => {
     const saved = localStorage.getItem('klan_payment_methods');
     if (saved) {
-      const parsed = JSON.parse(saved);
-      return parsed.map(p => ({ ...p, cardHolder: p.cardHolder === 'Bhargavi Mandli' ? 'Organic Customer' : p.cardHolder }));
+      try {
+        const parsed = JSON.parse(saved);
+        if (Array.isArray(parsed) && parsed.length > 0) {
+          return parsed.map(p => ({ ...p, cardHolder: p.cardHolder === 'Bhargavi Mandli' ? 'Organic Customer' : p.cardHolder }));
+        }
+      } catch (e) {
+        console.error(e);
+      }
     }
     return [
       {
+        id: 'pm-phonepe',
+        methodType: 'upi',
+        provider: 'PhonePe',
+        name: 'PhonePe UPI',
+        upiId: 'organic.customer@ybl',
+        isDefault: true,
+        verified: true
+      },
+      {
+        id: 'pm-gpay',
+        methodType: 'upi',
+        provider: 'Google Pay',
+        name: 'Google Pay UPI',
+        upiId: 'organic.customer@okicici',
+        isDefault: false,
+        verified: true
+      },
+      {
         id: 'pm-1',
+        methodType: 'card',
         cardHolder: 'Organic Customer',
         cardNumber: '4321',
         cardType: 'Visa',
         expiry: '12/28',
-        isDefault: true
+        isDefault: false
       },
       {
         id: 'pm-2',
+        methodType: 'card',
         cardHolder: 'Organic Customer',
         cardNumber: '8765',
         cardType: 'Mastercard',
@@ -159,7 +189,16 @@ export const MyOrdersPage = ({ initialNav }) => {
     ];
   });
 
+  const [paymentFilter, setPaymentFilter] = useState('all');
+  const [paymentFormType, setPaymentFormType] = useState('upi'); // 'upi' | 'card'
   const [showPaymentForm, setShowPaymentForm] = useState(false);
+
+  const [upiFormData, setUpiFormData] = useState({
+    provider: 'PhonePe',
+    upiId: '',
+    isDefault: false
+  });
+
   const [paymentFormData, setPaymentFormData] = useState({
     cardHolder: '',
     cardNumber: '',
@@ -320,10 +359,36 @@ export const MyOrdersPage = ({ initialNav }) => {
   };
 
   // --- PAYMENT ACTIONS ---
+  const handleUpiSubmit = (e) => {
+    e.preventDefault();
+    if (!upiFormData.upiId.trim()) return;
+
+    const newUpi = {
+      id: 'pm-' + Date.now(),
+      methodType: 'upi',
+      provider: upiFormData.provider,
+      name: `${upiFormData.provider} UPI`,
+      upiId: upiFormData.upiId.trim(),
+      isDefault: upiFormData.isDefault || paymentMethods.length === 0,
+      verified: true
+    };
+
+    if (newUpi.isDefault) {
+      setPaymentMethods(prev => prev.map(pm => ({ ...pm, isDefault: false })).concat(newUpi));
+    } else {
+      setPaymentMethods(prev => [...prev, newUpi]);
+    }
+
+    showToast(`${upiFormData.provider} UPI added successfully!`);
+    setShowPaymentForm(false);
+    setUpiFormData({ provider: 'PhonePe', upiId: '', isDefault: false });
+  };
+
   const handlePaymentSubmit = (e) => {
     e.preventDefault();
     const newCard = {
       id: 'pm-' + Date.now(),
+      methodType: 'card',
       cardHolder: paymentFormData.cardHolder,
       cardNumber: paymentFormData.cardNumber.slice(-4), // only store last 4
       cardType: paymentFormData.cardType,
@@ -337,7 +402,7 @@ export const MyOrdersPage = ({ initialNav }) => {
       setPaymentMethods(prev => [...prev, newCard]);
     }
 
-    showToast('Payment method added successfully!');
+    showToast('Payment card added successfully!');
     setShowPaymentForm(false);
     setPaymentFormData({ cardHolder: '', cardNumber: '', expiry: '', cvv: '', cardType: 'Visa', isDefault: false });
   };
@@ -429,7 +494,8 @@ export const MyOrdersPage = ({ initialNav }) => {
       <div className="my-orders-container">
         <div className="orders-breadcrumbs" style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '12px' }}>
           <button 
-            onClick={() => navigate(-1)} 
+            type="button"
+            onClick={(e) => handleBackNavigation(navigate, e)} 
             className="back-arrow-btn"
             title="Go back to previous page"
           >
@@ -992,165 +1058,363 @@ export const MyOrdersPage = ({ initialNav }) => {
               <div className="orders-header-flex-row">
                 <div className="orders-header">
                   <h1 className="page-heading">Saved Payment Methods</h1>
-                  <p className="page-subheading">Manage your credit cards, debit cards, and saved payment details</p>
+                  <p className="page-subheading">Manage your PhonePe, Google Pay UPI, credit cards, and debit cards</p>
                 </div>
                 {!showPaymentForm && (
-                  <button className="btn-solid-green add-new-btn-top" onClick={() => setShowPaymentForm(true)}>
-                    <Plus size={16} />
-                    <span>Add New Card</span>
-                  </button>
+                  <div className="add-pay-top-btn-group">
+                    <button className="btn-solid-green add-new-btn-top" onClick={() => { setPaymentFormType('upi'); setShowPaymentForm(true); }}>
+                      <Smartphone size={16} />
+                      <span>Add PhonePe / GPay</span>
+                    </button>
+                    <button className="btn-outline-green add-new-btn-top" onClick={() => { setPaymentFormType('card'); setShowPaymentForm(true); }}>
+                      <CreditCard size={16} />
+                      <span>Add Card</span>
+                    </button>
+                  </div>
                 )}
               </div>
 
+              {/* Payment Method Category Filter Tabs */}
+              {!showPaymentForm && (
+                <div className="payment-filter-bar">
+                  <button 
+                    className={`pay-filter-pill ${paymentFilter === 'all' ? 'active' : ''}`}
+                    onClick={() => setPaymentFilter('all')}
+                  >
+                    All Methods ({paymentMethods.length})
+                  </button>
+                  <button 
+                    className={`pay-filter-pill ${paymentFilter === 'upi' ? 'active' : ''}`}
+                    onClick={() => setPaymentFilter('upi')}
+                  >
+                    ⚡ PhonePe & Google Pay ({paymentMethods.filter(p => p.methodType === 'upi' || p.upiId).length})
+                  </button>
+                  <button 
+                    className={`pay-filter-pill ${paymentFilter === 'card' ? 'active' : ''}`}
+                    onClick={() => setPaymentFilter('card')}
+                  >
+                    💳 Credit & Debit Cards ({paymentMethods.filter(p => p.methodType === 'card' || (!p.methodType && p.cardNumber)).length})
+                  </button>
+                </div>
+              )}
+
               {showPaymentForm ? (
-                <div className="address-form-container-card">
-                  <h3>Add New Card</h3>
-                  <p className="form-sub-header-warning">⚠️ For security, card numbers are masked. Do not enter real credit card PINs.</p>
-                  
-                  <form onSubmit={handlePaymentSubmit} className="premium-form-layout">
-                    <div className="form-group">
-                      <label>Cardholder Name *</label>
-                      <input
-                        type="text"
-                        required
-                        placeholder="Name exactly as printed on card"
-                        value={paymentFormData.cardHolder}
-                        onChange={(e) => setPaymentFormData({ ...paymentFormData, cardHolder: e.target.value })}
-                      />
-                    </div>
+                <div className="address-form-container-card payment-form-wrapper-card">
+                  {/* Form Type Switcher */}
+                  <div className="payment-form-type-selector">
+                    <button 
+                      type="button" 
+                      className={`form-tab-btn ${paymentFormType === 'upi' ? 'active' : ''}`}
+                      onClick={() => setPaymentFormType('upi')}
+                    >
+                      <Smartphone size={18} />
+                      <span>Add UPI (PhonePe / Google Pay)</span>
+                    </button>
 
-                    <div className="form-row dual-fields">
+                    <button 
+                      type="button" 
+                      className={`form-tab-btn ${paymentFormType === 'card' ? 'active' : ''}`}
+                      onClick={() => setPaymentFormType('card')}
+                    >
+                      <CreditCard size={18} />
+                      <span>Add Credit / Debit Card</span>
+                    </button>
+                  </div>
+
+                  {paymentFormType === 'upi' ? (
+                    <form onSubmit={handleUpiSubmit} className="premium-form-layout">
+                      <h3>Save UPI Payment Method</h3>
+                      <p className="form-sub-header-warning">⚡ Save your VPA/UPI ID for 1-click checkout with PhonePe & Google Pay.</p>
+
                       <div className="form-group">
-                        <label>Card Number *</label>
+                        <label>Select App / Provider *</label>
+                        <div className="upi-provider-radio-grid">
+                          {[
+                            { id: 'PhonePe', name: 'PhonePe', color: '#5f259f', desc: '@ybl / @ibl handle' },
+                            { id: 'Google Pay', name: 'Google Pay', color: '#1a73e8', desc: '@okicici / @okaxis handle' },
+                            { id: 'Paytm', name: 'Paytm UPI', color: '#00baf2', desc: '@paytm handle' },
+                            { id: 'BHIM', name: 'BHIM UPI', color: '#00833a', desc: '@upi handle' }
+                          ].map(prov => (
+                            <div 
+                              key={prov.id} 
+                              className={`upi-prov-card ${upiFormData.provider === prov.id ? 'selected' : ''}`}
+                              onClick={() => setUpiFormData({ ...upiFormData, provider: prov.id })}
+                            >
+                              <div className="prov-header-row">
+                                <span className="prov-dot" style={{ background: prov.color }}></span>
+                                <strong className="prov-name">{prov.name}</strong>
+                              </div>
+                              <span className="prov-desc-handle">{prov.desc}</span>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+
+                      <div className="form-group">
+                        <label>{upiFormData.provider} VPA / UPI ID *</label>
+                        <div className="upi-input-relative">
+                          <input
+                            type="text"
+                            required
+                            placeholder={
+                              upiFormData.provider === 'PhonePe' ? 'e.g. mobile@ybl or user@ibl' :
+                              upiFormData.provider === 'Google Pay' ? 'e.g. user@okicici or user@okaxis' :
+                              'e.g. username@upi'
+                            }
+                            value={upiFormData.upiId}
+                            onChange={(e) => setUpiFormData({ ...upiFormData, upiId: e.target.value })}
+                          />
+                          <span className="vpa-verify-chip"><CheckCircle2 size={14} color="#16a34a" /> Instant Verify</span>
+                        </div>
+                      </div>
+
+                      <div className="form-group">
+                        <label className="checkbox-label-premium">
+                          <input
+                            type="checkbox"
+                            checked={upiFormData.isDefault}
+                            onChange={(e) => setUpiFormData({ ...upiFormData, isDefault: e.target.checked })}
+                          />
+                          <span>Set as default payment method</span>
+                        </label>
+                      </div>
+
+                      <div className="form-actions-row">
+                        <button type="submit" className="btn-solid-green">
+                          Save {upiFormData.provider} UPI
+                        </button>
+                        <button type="button" className="btn-cancel-link" onClick={() => setShowPaymentForm(false)}>
+                          Cancel
+                        </button>
+                      </div>
+                    </form>
+                  ) : (
+                    <form onSubmit={handlePaymentSubmit} className="premium-form-layout">
+                      <h3>Add New Credit / Debit Card</h3>
+                      <p className="form-sub-header-warning">⚠️ For security, card numbers are masked. Do not enter real credit card PINs.</p>
+                      
+                      <div className="form-group">
+                        <label>Cardholder Name *</label>
                         <input
                           type="text"
                           required
-                          maxLength="19"
-                          placeholder="16-digit card number"
-                          value={paymentFormData.cardNumber}
-                          onChange={(e) => setPaymentFormData({ ...paymentFormData, cardNumber: e.target.value.replace(/\s?/g, '') })}
+                          placeholder="Name exactly as printed on card"
+                          value={paymentFormData.cardHolder}
+                          onChange={(e) => setPaymentFormData({ ...paymentFormData, cardHolder: e.target.value })}
                         />
                       </div>
-                      <div className="form-group">
-                        <label>Card Issuer / Network</label>
-                        <select
-                          value={paymentFormData.cardType}
-                          onChange={(e) => setPaymentFormData({ ...paymentFormData, cardType: e.target.value })}
-                        >
-                          <option value="Visa">Visa</option>
-                          <option value="Mastercard">Mastercard</option>
-                          <option value="Rupay">Rupay</option>
-                          <option value="American Express">American Express</option>
-                        </select>
-                      </div>
-                    </div>
 
-                    <div className="form-row dual-fields">
-                      <div className="form-group">
-                        <label>Expiry Date *</label>
-                        <input
-                          type="text"
-                          required
-                          placeholder="MM/YY"
-                          maxLength="5"
-                          value={paymentFormData.expiry}
-                          onChange={(e) => setPaymentFormData({ ...paymentFormData, expiry: e.target.value })}
-                        />
+                      <div className="form-row dual-fields">
+                        <div className="form-group">
+                          <label>Card Number *</label>
+                          <input
+                            type="text"
+                            required
+                            maxLength="19"
+                            placeholder="16-digit card number"
+                            value={paymentFormData.cardNumber}
+                            onChange={(e) => setPaymentFormData({ ...paymentFormData, cardNumber: e.target.value.replace(/\s?/g, '') })}
+                          />
+                        </div>
+                        <div className="form-group">
+                          <label>Card Issuer / Network</label>
+                          <select
+                            value={paymentFormData.cardType}
+                            onChange={(e) => setPaymentFormData({ ...paymentFormData, cardType: e.target.value })}
+                          >
+                            <option value="Visa">Visa</option>
+                            <option value="Mastercard">Mastercard</option>
+                            <option value="Rupay">Rupay</option>
+                            <option value="American Express">American Express</option>
+                          </select>
+                        </div>
                       </div>
-                      <div className="form-group">
-                        <label>CVV *</label>
-                        <input
-                          type="password"
-                          required
-                          maxLength="3"
-                          placeholder="3 digits"
-                          value={paymentFormData.cvv}
-                          onChange={(e) => setPaymentFormData({ ...paymentFormData, cvv: e.target.value })}
-                        />
+
+                      <div className="form-row dual-fields">
+                        <div className="form-group">
+                          <label>Expiry Date *</label>
+                          <input
+                            type="text"
+                            required
+                            placeholder="MM/YY"
+                            maxLength="5"
+                            value={paymentFormData.expiry}
+                            onChange={(e) => setPaymentFormData({ ...paymentFormData, expiry: e.target.value })}
+                          />
+                        </div>
+                        <div className="form-group">
+                          <label>CVV *</label>
+                          <input
+                            type="password"
+                            required
+                            maxLength="3"
+                            placeholder="3 digits"
+                            value={paymentFormData.cvv}
+                            onChange={(e) => setPaymentFormData({ ...paymentFormData, cvv: e.target.value })}
+                          />
+                        </div>
                       </div>
-                    </div>
 
-                    <div className="form-group">
-                      <label className="checkbox-label-premium">
-                        <input
-                          type="checkbox"
-                          checked={paymentFormData.isDefault}
-                          onChange={(e) => setPaymentFormData({ ...paymentFormData, isDefault: e.target.checked })}
-                        />
-                        <span>Set as default payment card</span>
-                      </label>
-                    </div>
+                      <div className="form-group">
+                        <label className="checkbox-label-premium">
+                          <input
+                            type="checkbox"
+                            checked={paymentFormData.isDefault}
+                            onChange={(e) => setPaymentFormData({ ...paymentFormData, isDefault: e.target.checked })}
+                          />
+                          <span>Set as default payment card</span>
+                        </label>
+                      </div>
 
-                    <div className="form-actions-row">
-                      <button type="submit" className="btn-solid-green">
-                        Save Card
-                      </button>
-                      <button type="button" className="btn-cancel-link" onClick={() => setShowPaymentForm(false)}>
-                        Cancel
-                      </button>
-                    </div>
-                  </form>
+                      <div className="form-actions-row">
+                        <button type="submit" className="btn-solid-green">
+                          Save Card
+                        </button>
+                        <button type="button" className="btn-cancel-link" onClick={() => setShowPaymentForm(false)}>
+                          Cancel
+                        </button>
+                      </div>
+                    </form>
+                  )}
                 </div>
               ) : (
                 <div className="payment-cards-grid">
-                  {paymentMethods.map(card => {
-                    const typeLower = card.cardType.toLowerCase();
-                    let themeClass = 'theme-visa';
-                    if (typeLower.includes('master')) themeClass = 'theme-master';
-                    else if (typeLower.includes('rupay')) themeClass = 'theme-rupay';
-                    else if (typeLower.includes('express') || typeLower.includes('amex')) themeClass = 'theme-amex';
+                  {paymentMethods
+                    .filter(pm => {
+                      if (paymentFilter === 'upi') return pm.methodType === 'upi' || pm.upiId;
+                      if (paymentFilter === 'card') return pm.methodType === 'card' || (!pm.methodType && pm.cardNumber);
+                      return true;
+                    })
+                    .map(pm => {
+                      const isUpi = pm.methodType === 'upi' || Boolean(pm.upiId);
 
-                    return (
-                      <div key={card.id} className={`metallic-credit-card ${themeClass} ${card.isDefault ? 'is-default-card' : ''}`}>
-                        <div className="card-top-header">
-                          <div className="emv-chip-box">
-                            <span className="emv-chip"></span>
-                            <Wifi size={18} className="contactless-icon" />
+                      if (isUpi) {
+                        const provLower = (pm.provider || '').toLowerCase();
+                        let themeClass = 'theme-phonepe';
+                        if (provLower.includes('google') || provLower.includes('gpay')) themeClass = 'theme-gpay';
+                        else if (provLower.includes('paytm')) themeClass = 'theme-paytm';
+                        else if (provLower.includes('bhim')) themeClass = 'theme-bhim';
+
+                        return (
+                          <div key={pm.id} className={`upi-payment-card ${themeClass} ${pm.isDefault ? 'is-default-card' : ''}`}>
+                            <div className="upi-card-header">
+                              <div className="upi-app-badge-box">
+                                {provLower.includes('phonepe') ? (
+                                  <div className="phonepe-logo-badge">
+                                    <span>pe</span>
+                                  </div>
+                                ) : provLower.includes('google') || provLower.includes('gpay') ? (
+                                  <div className="gpay-logo-badge">
+                                    <span className="gpay-g">G</span><span className="gpay-p">Pay</span>
+                                  </div>
+                                ) : provLower.includes('paytm') ? (
+                                  <div className="paytm-logo-badge">
+                                    <span>Paytm</span>
+                                  </div>
+                                ) : (
+                                  <div className="bhim-logo-badge">
+                                    <Smartphone size={16} />
+                                  </div>
+                                )}
+                                <div className="upi-title-meta">
+                                  <h4 className="upi-app-title">{pm.name || `${pm.provider} UPI`}</h4>
+                                  <span className="upi-verified-badge"><Check size={11} /> Verified VPA</span>
+                                </div>
+                              </div>
+                              <span className="upi-top-tag">UPI</span>
+                            </div>
+
+                            <div className="upi-card-body">
+                              <span className="upi-body-lbl">SAVED VPA / UPI ID</span>
+                              <p className="upi-body-val">{pm.upiId}</p>
+                              <div className="upi-sub-feature">
+                                <Zap size={13} color="#f59e0b" />
+                                <span>1-Click Auto Pay Enabled</span>
+                              </div>
+                            </div>
+
+                            <div className="card-footer-actions">
+                              {pm.isDefault ? (
+                                <span className="default-card-badge upi-primary">✓ Primary Payment Method</span>
+                              ) : (
+                                <button className="btn-set-default-pill" onClick={() => handleSetDefaultPayment(pm.id)}>
+                                  Set as Default
+                                </button>
+                              )}
+                              <button className="btn-delete-card-pill" title="Delete Payment Method" onClick={() => handleDeletePayment(pm.id)}>
+                                <Trash2 size={14} />
+                              </button>
+                            </div>
                           </div>
-                          <span className="card-brand-logo">{card.cardType.toUpperCase()}</span>
-                        </div>
+                        );
+                      }
 
-                        <div className="card-number-dots">
-                          <span>••••</span>
-                          <span>••••</span>
-                          <span>••••</span>
-                          <strong className="last4-digits">{card.cardNumber}</strong>
-                        </div>
+                      // Card rendering
+                      const typeLower = (pm.cardType || '').toLowerCase();
+                      let themeClass = 'theme-visa';
+                      if (typeLower.includes('master')) themeClass = 'theme-master';
+                      else if (typeLower.includes('rupay')) themeClass = 'theme-rupay';
+                      else if (typeLower.includes('express') || typeLower.includes('amex')) themeClass = 'theme-amex';
 
-                        <div className="card-bottom-meta">
-                          <div className="meta-col">
-                            <span className="meta-lbl">CARDHOLDER NAME</span>
-                            <p className="meta-val">{card.cardHolder}</p>
+                      return (
+                        <div key={pm.id} className={`metallic-credit-card ${themeClass} ${pm.isDefault ? 'is-default-card' : ''}`}>
+                          <div className="card-top-header">
+                            <div className="emv-chip-box">
+                              <span className="emv-chip"></span>
+                              <Wifi size={18} className="contactless-icon" />
+                            </div>
+                            <span className="card-brand-logo">{(pm.cardType || 'CARD').toUpperCase()}</span>
                           </div>
-                          <div className="meta-col">
-                            <span className="meta-lbl">EXPIRES</span>
-                            <p className="meta-val">{card.expiry}</p>
-                          </div>
-                        </div>
 
-                        <div className="card-footer-actions">
-                          {card.isDefault ? (
-                            <span className="default-card-badge">✓ Primary Payment Card</span>
-                          ) : (
-                            <button className="btn-set-default-pill" onClick={() => handleSetDefaultPayment(card.id)}>
-                              Set as Default
+                          <div className="card-number-dots">
+                            <span>••••</span>
+                            <span>••••</span>
+                            <span>••••</span>
+                            <strong className="last4-digits">{pm.cardNumber}</strong>
+                          </div>
+
+                          <div className="card-bottom-meta">
+                            <div className="meta-col">
+                              <span className="meta-lbl">CARDHOLDER NAME</span>
+                              <p className="meta-val">{pm.cardHolder}</p>
+                            </div>
+                            <div className="meta-col">
+                              <span className="meta-lbl">EXPIRES</span>
+                              <p className="meta-val">{pm.expiry}</p>
+                            </div>
+                          </div>
+
+                          <div className="card-footer-actions">
+                            {pm.isDefault ? (
+                              <span className="default-card-badge">✓ Primary Payment Card</span>
+                            ) : (
+                              <button className="btn-set-default-pill" onClick={() => handleSetDefaultPayment(pm.id)}>
+                                Set as Default
+                              </button>
+                            )}
+                            <button className="btn-delete-card-pill" title="Delete Card" onClick={() => handleDeletePayment(pm.id)}>
+                              <Trash2 size={14} />
                             </button>
-                          )}
-                          <button className="btn-delete-card-pill" title="Delete Card" onClick={() => handleDeletePayment(card.id)}>
-                            <Trash2 size={14} />
-                          </button>
+                          </div>
                         </div>
-                      </div>
-                    );
-                  })}
+                      );
+                    })}
 
-                  {/* Add Card Dashed Box */}
-                  <div className="add-payment-dash-card" onClick={() => setShowPaymentForm(true)}>
+                  {/* Add New Dashed Cards */}
+                  <div className="add-payment-dash-card upi-dash-card" onClick={() => { setPaymentFormType('upi'); setShowPaymentForm(true); }}>
+                    <div className="plus-icon-circle phonepe-gpay-plus">
+                      <Smartphone size={22} />
+                    </div>
+                    <h4>Add PhonePe / GPay</h4>
+                    <p>Save PhonePe, Google Pay or BHIM UPI ID</p>
+                  </div>
+
+                  <div className="add-payment-dash-card" onClick={() => { setPaymentFormType('card'); setShowPaymentForm(true); }}>
                     <div className="plus-icon-circle">
                       <Plus size={22} />
                     </div>
-                    <h4>Add New Card</h4>
-                    <p>Save Credit, Debit or ATM Card</p>
+                    <h4>Add Credit/Debit Card</h4>
+                    <p>Save Visa, Mastercard, RuPay Card</p>
                   </div>
                 </div>
               )}

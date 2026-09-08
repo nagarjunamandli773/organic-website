@@ -2,10 +2,14 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { ShieldCheck, CheckCircle2, CreditCard, Smartphone, Landmark, Banknote, ArrowRight, ArrowLeft } from 'lucide-react';
 import { useCart } from '../context/CartContext';
+import { useAuth } from '../context/AuthContext';
+import { handleBackNavigation } from '../utils/navigation';
+import { CouponSection } from '../components/CouponSection';
 
 export const CheckoutPage = () => {
   const navigate = useNavigate();
-  const { cartItems, subtotal, discount, deliveryFee, total, clearCart } = useCart();
+  const { cartItems, subtotal, discount, deliveryFee, total, clearCart, appliedCoupon, markCouponAsUsed } = useCart();
+  const { user } = useAuth();
 
   const [formData, setFormData] = useState({
     fullName: '',
@@ -47,11 +51,30 @@ export const CheckoutPage = () => {
         orderId,
         date: new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }),
         items: cartItems,
+        subtotal,
+        discount,
+        deliveryFee,
         total,
-        paymentMethod,
+        appliedCoupon: appliedCoupon ? {
+          code: appliedCoupon.code,
+          title: appliedCoupon.title,
+          discountAmount: discount
+        } : null,
+        paymentMethod: paymentMethod === 'upi' ? 'UPI / Wallet' : paymentMethod === 'card' ? 'Credit / Debit Card' : paymentMethod === 'netbanking' ? 'Net Banking' : 'Cash on Delivery',
         shippingAddress: formData
       };
       localStorage.setItem('last_order', JSON.stringify(newOrder));
+
+      // Mark order placed & coupon as used
+      if (user && user.email) {
+        const userEmailKey = user.email.toLowerCase().trim();
+        localStorage.setItem(`klan_has_completed_order_${userEmailKey}`, 'true');
+      }
+
+      if (appliedCoupon) {
+        markCouponAsUsed(appliedCoupon.code);
+      }
+
       clearCart();
       navigate('/order-success');
     }
@@ -75,7 +98,8 @@ export const CheckoutPage = () => {
     <div className="checkout-page">
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '8px' }}>
         <button 
-          onClick={() => navigate(-1)} 
+          type="button"
+          onClick={(e) => handleBackNavigation(navigate, e)} 
           className="back-arrow-btn"
           title="Go back to previous page"
         >
@@ -262,6 +286,9 @@ export const CheckoutPage = () => {
                 </div>
               ))}
             </div>
+            <div className="checkout-coupon-wrapper" style={{ marginTop: '16px', marginBottom: '16px' }}>
+              <CouponSection />
+            </div>
 
             <div className="summary-divider"></div>
 
@@ -275,10 +302,12 @@ export const CheckoutPage = () => {
                 {deliveryFee === 0 ? '₹0.00' : `₹${deliveryFee.toFixed(2)}`}
               </span>
             </div>
-            <div className="summary-line discount-line">
-              <span>Discount</span>
-              <span className="line-price discount-price">-₹{discount.toFixed(2)}</span>
-            </div>
+            {discount > 0 && (
+              <div className="summary-line discount-line">
+                <span>Discount</span>
+                <span className="line-price discount-price">-₹{discount.toFixed(2)}</span>
+              </div>
+            )}
 
             <div className="summary-total-row">
               <span className="total-title">Total</span>

@@ -6,6 +6,7 @@ import { PRODUCTS } from '../data/products';
 import { ProductCard } from '../components/ProductCard';
 import { ProductDetailsModal } from '../components/ProductDetailsModal';
 import { useCart } from '../context/CartContext';
+import { handleBackNavigation } from '../utils/navigation';
 
 export const BlogPage = () => {
   const navigate = useNavigate();
@@ -67,7 +68,8 @@ export const BlogPage = () => {
       {/* 2. Breadcrumbs & Back */}
       <div className="blog-breadcrumbs" style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '12px' }}>
         <button 
-          onClick={() => navigate(-1)} 
+          type="button"
+          onClick={(e) => handleBackNavigation(navigate, e)} 
           className="back-arrow-btn"
           title="Go back to previous page"
         >

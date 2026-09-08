@@ -4,6 +4,7 @@ import { ArrowLeft, ChevronRight, Search, Sparkles, Tag, PackageCheck, Leaf, Fil
 import { COMBOS } from '../data/combos';
 import { ComboCard } from '../components/ComboCard';
 import { ComboDetailsModal } from '../components/ComboDetailsModal';
+import { handleBackNavigation } from '../utils/navigation';
 
 export const ComboOffersPage = () => {
   const navigate = useNavigate();
@@ -55,7 +56,8 @@ export const ComboOffersPage = () => {
       {/* Top Breadcrumb & Back Navigation */}
       <div className="combo-nav-breadcrumbs">
         <button
-          onClick={() => navigate(-1)}
+          type="button"
+          onClick={(e) => handleBackNavigation(navigate, e)}
           className="back-arrow-btn"
           title="Go back to previous page"
         >

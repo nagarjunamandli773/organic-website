@@ -1,5 +1,20 @@
 export const OFFERS = [
   {
+    id: 'off-welcome10',
+    title: '10% OFF',
+    subtitle: 'Welcome Coupon - First Order Only',
+    code: 'WELCOME10',
+    discountPercent: 10,
+    minOrder: 0,
+    discountType: 'percent',
+    isFirstOrderOnly: true,
+    isOneTime: true,
+    expiryDate: '2026-12-31',
+    expiryDateFormatted: '31 Dec 2026',
+    description: 'Get 10% OFF on your very first order of organic products.',
+    icon: 'Gift'
+  },
+  {
     id: 'off-1',
     title: '₹200 OFF',
     subtitle: 'On Orders Above ₹1499',
@@ -7,6 +22,10 @@ export const OFFERS = [
     discountAmount: 200,
     minOrder: 1499,
     discountType: 'fixed',
+    isOneTime: true,
+    expiryDate: '2026-12-31',
+    expiryDateFormatted: '31 Dec 2026',
+    description: 'Flat ₹200 discount on cart total above ₹1499.',
     icon: 'Percent'
   },
   {
@@ -17,6 +36,10 @@ export const OFFERS = [
     discountAmount: 500,
     minOrder: 2999,
     discountType: 'fixed',
+    isOneTime: true,
+    expiryDate: '2026-12-31',
+    expiryDateFormatted: '31 Dec 2026',
+    description: 'Flat ₹500 discount on cart total above ₹2999.',
     icon: 'Tag'
   },
   {
@@ -28,6 +51,10 @@ export const OFFERS = [
     minOrder: 499,
     discountType: 'percent',
     category: 'Cosmetics',
+    isOneTime: false,
+    expiryDate: '2026-12-31',
+    expiryDateFormatted: '31 Dec 2026',
+    description: '20% OFF on all natural organic beauty and cosmetics items.',
     icon: 'Sparkles'
   },
   {
@@ -38,6 +65,10 @@ export const OFFERS = [
     discountAmount: 49,
     minOrder: 499,
     discountType: 'shipping',
+    isOneTime: false,
+    expiryDate: '2026-12-31',
+    expiryDateFormatted: '31 Dec 2026',
+    description: 'Free standard delivery on orders above ₹499.',
     icon: 'Truck'
   }
 ];

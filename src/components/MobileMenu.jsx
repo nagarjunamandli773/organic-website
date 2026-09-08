@@ -1,6 +1,6 @@
 import React from 'react';
 import { Link, NavLink } from 'react-router-dom';
-import { X, Home, ShoppingBag, Apple, Carrot, Sparkles, Droplet, TestTube, Sprout, Wheat, Tag, BookOpen, User, Info, Phone, Heart, PackageCheck } from 'lucide-react';
+import { X, Home, ShoppingBag, Apple, Carrot, Sparkles, Droplet, TestTube, Sprout, Wheat, Tag, BookOpen, User, Info, Phone, Heart, PackageCheck, UtensilsCrossed } from 'lucide-react';
 import { CATEGORIES } from '../data/categories';
 import { Logo } from './Logo';
 

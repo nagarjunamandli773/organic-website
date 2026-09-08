@@ -1,5 +1,5 @@
 import React, { useState, useMemo } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { 
   ChevronRight, Heart, Star, Plus, Minus, ShoppingCart, 
   ChevronUp, ChevronDown, Check, ArrowLeft, ArrowRight, Sprout 
@@ -7,8 +7,10 @@ import {
 import { useCart } from '../context/CartContext';
 import { useWishlist } from '../context/WishlistContext';
 import { SNACKS_SWEETS_CATEGORIES, SNACKS_SWEETS_PRODUCTS } from '../data/snacksSweetsData';
+import { handleBackNavigation } from '../utils/navigation';
 
 export const SnacksSweetsPage = () => {
+  const navigate = useNavigate();
   const { addToCart } = useCart();
   const { wishlist, toggleWishlist } = useWishlist();
 
@@ -17,7 +19,7 @@ export const SnacksSweetsPage = () => {
   
   // Type section filter: 'all' | 'snack' | 'sweet'
   const [activeTypeTab, setActiveTypeTab] = useState('all');
-  
+
   // Accordion toggle states in sidebar
   const [isCatOpen, setIsCatOpen] = useState(true);
   const [isPriceOpen, setIsPriceOpen] = useState(false);
@@ -104,10 +106,15 @@ export const SnacksSweetsPage = () => {
           {/* Left Column: Back button + Breadcrumbs + Large Title + Description + Leaf Tags */}
           <div className="ss-header-left-col">
             <div className="ss-header-controls-row">
-              <Link to="/" className="btn-back-pill">
+              <button 
+                type="button" 
+                onClick={(e) => handleBackNavigation(navigate, e)} 
+                className="btn-back-pill"
+                title="Go back to previous page"
+              >
                 <ArrowLeft size={15} />
                 <span>Back</span>
-              </Link>
+              </button>
               <div className="page-breadcrumbs-inline">
                 <Link to="/">Home</Link>
                 <ChevronRight size={14} className="crumb-icon" />
@@ -168,14 +175,16 @@ export const SnacksSweetsPage = () => {
         <div className="ss-layout-grid-ref">
           {/* Left Sidebar Filters */}
           <aside className="ss-sidebar-ref">
-            <div className="sidebar-ref-header">
-              <h3 className="sidebar-ref-title">Filters</h3>
-              <button className="btn-clear-all-green" onClick={clearAllFilters}>
-                Clear All
-              </button>
-            </div>
-
             <div className="sidebar-ref-card">
+              <div className="sidebar-ref-header">
+                <h3 className="sidebar-ref-title">Filters</h3>
+                <button className="btn-clear-all-green" onClick={clearAllFilters}>
+                  Clear All
+                </button>
+              </div>
+
+              <div className="ref-divider"></div>
+
               {/* Accordion 1: Categories (Highlights One-by-One) */}
               <div className="ref-filter-group">
                 <button className="ref-accordion-btn" onClick={() => setIsCatOpen(!isCatOpen)}>
@@ -315,11 +324,13 @@ export const SnacksSweetsPage = () => {
               <div className="ss-products-grid-4col">
                 {filteredProducts.map(product => {
                   const isWishlisted = wishlist.some(item => item.id === product.id);
+                  const badgeText = product.badge || (product.type === 'sweet' ? 'Pure Sweets' : '100% Organic');
 
                   return (
                     <div key={product.id} className="ref-product-card">
-                      {/* Product Image with Fallback */}
+                      {/* Product Image with Fallback & Orange Pill Badge */}
                       <div className="ref-card-img-wrapper">
+                        <span className="ref-badge-tag">{badgeText}</span>
                         <img 
                           src={product.image} 
                           alt={product.name} 

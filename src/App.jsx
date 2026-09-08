@@ -10,6 +10,7 @@ import { Navigation } from './components/Navigation';
 import { MobileMenu } from './components/MobileMenu';
 import { CartDrawer } from './components/CartDrawer';
 import { AuthModal } from './components/AuthModal';
+import { WelcomeCouponModal } from './components/WelcomeCouponModal';
 import { Footer } from './components/Footer';
 import { ToastNotification } from './components/ToastNotification';
 
@@ -72,6 +73,9 @@ export function App() {
 
               {/* Login / Sign Up Modal */}
               <AuthModal />
+
+              {/* First-Time User Welcome Coupon Modal */}
+              <WelcomeCouponModal />
 
               {/* Global Toast Notifications */}
               <ToastNotification />

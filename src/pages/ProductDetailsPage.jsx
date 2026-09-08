@@ -5,6 +5,7 @@ import { useCart } from '../context/CartContext';
 import { useWishlist } from '../context/WishlistContext';
 import { ProductCard } from '../components/ProductCard';
 import { PRODUCTS } from '../data/products';
+import { handleBackNavigation } from '../utils/navigation';
 
 export const ProductDetailsPage = () => {
   const { productId } = useParams();
@@ -34,7 +35,8 @@ export const ProductDetailsPage = () => {
       {/* Breadcrumbs & Back Navigation */}
       <div className="breadcrumbs-container" style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '12px' }}>
         <button 
-          onClick={() => navigate(-1)} 
+          type="button"
+          onClick={(e) => handleBackNavigation(navigate, e)} 
           className="back-arrow-btn"
           title="Go back to previous page"
         >

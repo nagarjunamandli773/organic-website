@@ -18,6 +18,8 @@ import {
 } from 'lucide-react';
 import { useCart } from '../context/CartContext';
 import { PRODUCTS } from '../data/products';
+import { handleBackNavigation } from '../utils/navigation';
+import { CouponSection } from '../components/CouponSection';
 
 export const CartPage = () => {
   const navigate = useNavigate();
@@ -92,7 +94,8 @@ export const CartPage = () => {
         {/* Breadcrumb Header */}
         <div className="cart-breadcrumbs" style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '12px' }}>
           <button 
-            onClick={() => navigate(-1)} 
+            type="button"
+            onClick={(e) => handleBackNavigation(navigate, e)} 
             className="back-arrow-btn"
             title="Go back to previous page"
           >
@@ -213,7 +216,7 @@ export const CartPage = () => {
               <div className="cart-table-footer">
                 <button 
                   type="button" 
-                  onClick={() => navigate(-1)} 
+                  onClick={(e) => handleBackNavigation(navigate, e)} 
                   className="btn-outline-green continue-shopping-btn"
                   style={{ cursor: 'pointer' }}
                 >
@@ -259,49 +262,8 @@ export const CartPage = () => {
                 </div>
               </div>
 
-              {/* Coupon Box */}
-              <div className="coupon-section-box">
-                <label className="coupon-label">Apply Promo Code</label>
-                {appliedCoupon ? (
-                  <div className="applied-coupon-card">
-                    <div className="applied-coupon-details">
-                      <CheckCircle2 size={16} className="check-icon" />
-                      <div>
-                        <strong>{appliedCoupon.code}</strong>
-                        <p>Discount applied to your cart</p>
-                      </div>
-                    </div>
-                    <button className="remove-coupon-text-btn" onClick={removeCoupon}>
-                      Remove
-                    </button>
-                  </div>
-                ) : (
-                  <>
-                    <form onSubmit={handleApplyCouponSubmit} className="coupon-form-grid">
-                      <input
-                        type="text"
-                        placeholder="Enter code (e.g. KLAN200)"
-                        value={couponCodeInput}
-                        onChange={(e) => setCouponCodeInput(e.target.value)}
-                        className="coupon-text-input"
-                      />
-                      <button type="submit" className="coupon-submit-btn">
-                        Apply
-                      </button>
-                    </form>
-                    {couponError && <div className="coupon-error-alert">{couponError}</div>}
-                    <div className="quick-coupons-row">
-                      <span className="quick-label">Try:</span>
-                      <button type="button" className="quick-coupon-chip" onClick={() => handleQuickCoupon('KLAN200')}>
-                        KLAN200
-                      </button>
-                      <button type="button" className="quick-coupon-chip" onClick={() => handleQuickCoupon('FREESHIP')}>
-                        FREESHIP
-                      </button>
-                    </div>
-                  </>
-                )}
-              </div>
+              {/* Coupon Box Component */}
+              <CouponSection />
 
               {/* Total Calculation */}
               <div className="summary-total-box">

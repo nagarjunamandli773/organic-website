@@ -11,8 +11,8 @@ import { PRODUCTS } from '../data/products';
 export const Home = () => {
   const [quickViewProduct, setQuickViewProduct] = useState(null);
 
-  // Best selling products selection matching reference image (6 products)
-  const bestsellerProducts = PRODUCTS.slice(0, 6);
+  // Best selling products selection (8 products for 4 in a row)
+  const bestsellerProducts = PRODUCTS.slice(0, 8);
 
   return (
     <div className="home-page">
